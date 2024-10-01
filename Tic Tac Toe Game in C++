@@ -1,0 +1,119 @@
+#include <iostream>
+using namespace std;
+
+char board[3][3] = {{'1','2','3'}, {'4','5','6'}, {'7','8','9'}};
+char currentPlayer = 'X';
+int xWins = 0;
+int oWins = 0;
+
+void drawBoard() {
+    cout << "Tic-Tac-Toe Game" << endl;
+    cout << "-----------------" << endl;
+    cout << "Board:" << endl;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            cout << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << "Scoreboard:" << endl;
+    cout << "Player X: " << xWins << " wins" << endl;
+    cout << "Player O: " << oWins << " wins" << endl;
+}
+
+bool isValidMove(int move) {
+    if (move < 1 || move > 9) {
+        return false;
+    }
+    int row = (move - 1) / 3;
+    int col = (move - 1) % 3;
+    return board[row][col] != 'X' && board[row][col] != 'O';
+}
+
+void makeMove(int move) {
+    int row = (move - 1) / 3;
+    int col = (move - 1) % 3;
+    board[row][col] = currentPlayer;
+}
+
+bool checkWin() {
+    for (int i = 0; i < 3; ++i) {
+        if (board[i][0] == currentPlayer && board[i][1] == currentPlayer && board[i][2] == currentPlayer) {
+            return true; // Row win
+        }
+        if (board[0][i] == currentPlayer && board[1][i] == currentPlayer && board[2][i] == currentPlayer) {
+            return true; // Column win
+        }
+    }
+    if (board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) {
+        return true; // Diagonal win
+    }
+   if (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer) {
+        return true; // Diagonal win
+    }
+    return false;
+}
+
+bool checkDraw() {
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (board[i][j] != 'X' && board[i][j] != 'O') {
+                return false; // Board is not full
+            }
+        }
+    }
+    return true; // Board is full (draw)
+}
+
+void switchPlayer() {
+    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+}
+
+int main() {
+    char rematch; // declare rematch variable
+    do {
+        int move;
+        while (true) {
+            drawBoard();
+            cout << "Player " << currentPlayer << ", enter your move (1-9): ";
+            cin >> move;
+            if (!isValidMove(move)) {
+                cout << "Invalid move! Please try again." << endl;
+                continue;
+            }
+            makeMove(move);
+            if (checkWin()) {
+                drawBoard();
+                cout << "Player " << currentPlayer << " wins!" << endl;
+                if (currentPlayer == 'X') {
+                    xWins++;
+                } else {
+                    oWins++;
+                }
+                break;
+            }
+            if (checkDraw()) {
+                drawBoard();
+                cout << "It's a draw!" << endl;
+                break;
+            }
+            switchPlayer();
+        }
+        cout << "Do you want to play again? (Y/N): "; // ask for rematch
+        cin >> rematch;
+        // Reset the board for a new game if rematch is chosen
+        if (rematch == 'Y' || rematch == 'y') {
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    board[i][j] = '1' + i * 3 + j; // Reset board with numbers 1-9
+                }
+            }
+            currentPlayer = 'X'; // Reset player to X
+        }
+    } while (rematch == 'Y' || rematch == 'y'); // loop as long as rematch is chosen
+    
+    // Display the scoreboard even if the player doesn't want a rematch
+    drawBoard();
+    
+    return 0;
+}
