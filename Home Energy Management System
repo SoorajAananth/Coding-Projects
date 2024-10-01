@@ -1,0 +1,152 @@
+#include <iostream>
+#include <string>
+#include <map>
+
+using namespace std;
+
+// Class representing a home appliance
+class Appliance {
+private:
+    string name;
+    double powerConsumption; // in watts
+    bool isOn;
+
+public:
+    // Default constructor
+    Appliance() : name("Unknown"), powerConsumption(0.0), isOn(false) {}
+
+    // Parameterized constructor
+    Appliance(string name, double power) : name(name), powerConsumption(power), isOn(false) {}
+
+    // Turn on the appliance
+    void turnOn() {
+        isOn = true;
+        cout << name << " is now ON." << endl;
+    }
+
+    // Turn off the appliance
+    void turnOff() {
+        isOn = false;
+        cout << name << " is now OFF." << endl;
+    }
+
+    // Get the power consumption if the appliance is ON
+    double getPowerConsumption() const {
+        return isOn ? powerConsumption : 0.0;
+    }
+
+    // Get the total power the appliance would consume if it were ON
+    double getConservedPower() const {
+        return !isOn ? powerConsumption : 0.0;
+    }
+};
+
+// Home Energy Management System class
+class HomeEnergyManager {
+private:
+    map<string, Appliance> appliances;
+    double totalConservedPower;
+
+public:
+    HomeEnergyManager() : totalConservedPower(0.0) {}
+
+    // Add an appliance to the system
+    void addAppliance(const string& name, double power) {
+        appliances.emplace(name, Appliance(name, power));
+    }
+
+    // Turn on an appliance
+    void turnOnAppliance(const string& name) {
+        if (appliances.find(name) != appliances.end()) {
+            appliances[name].turnOn();
+        } else {
+            cout << "Appliance not found!" << endl;
+        }
+    }
+
+    // Turn off an appliance
+    void turnOffAppliance(const string& name) {
+        if (appliances.find(name) != appliances.end()) {
+            appliances[name].turnOff();
+        } else {
+            cout << "Appliance not found!" << endl;
+        }
+    }
+
+    // Calculate the total power conserved by the system
+    void calculateTotalConservedPower() {
+        totalConservedPower = 0.0;
+        for (const auto& pair : appliances) {
+            totalConservedPower += pair.second.getConservedPower();
+        }
+    }
+
+    // Display the total power conserved by all appliances that are OFF
+    void displayConservedPower() const {
+        cout << "\nTotal Power Conserved: " << totalConservedPower << " W" << endl;
+    }
+
+    // Display the status of all appliances
+    void displayAppliancesStatus() const {
+        cout << "\nAppliance Status:" << endl;
+        for (const auto& pair : appliances) {
+            cout << pair.first << " is " << (pair.second.getPowerConsumption() > 0 ? "ON" : "OFF") << endl;
+        }
+    }
+};
+
+int main() {
+    HomeEnergyManager manager;
+
+    // Adding appliances
+    manager.addAppliance("Air Conditioner", 3500.0);
+    manager.addAppliance("Refrigerator", 150.0);
+    manager.addAppliance("Washing Machine", 500.0);
+    manager.addAppliance("Television", 100.0);
+
+    // Menu for user interaction
+    string userInput;
+    string applianceName;
+    char onOffChoice;
+
+    while (true) {
+        cout << "\n1. Turn an appliance ON/OFF" << endl;
+        cout << "2. Show total power conserved" << endl;
+        cout << "3. Show appliance status" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> userInput;
+
+        if (userInput == "1") {
+            // Turn an appliance on or off
+            cout << "Enter the appliance name (e.g., Air Conditioner, Refrigerator, etc.): ";
+            cin.ignore(); // To consume the newline character
+            getline(cin, applianceName);
+
+            cout << "Do you want to turn it ON or OFF? (Enter 'O' for ON, 'F' for OFF): ";
+            cin >> onOffChoice;
+
+            if (onOffChoice == 'O' || onOffChoice == 'o') {
+                manager.turnOnAppliance(applianceName);
+            } else if (onOffChoice == 'F' || onOffChoice == 'f') {
+                manager.turnOffAppliance(applianceName);
+            } else {
+                cout << "Invalid choice! Please enter 'O' for ON or 'F' for OFF." << endl;
+            }
+        } else if (userInput == "2") {
+            // Calculate and display total power conserved
+            manager.calculateTotalConservedPower();
+            manager.displayConservedPower();
+        } else if (userInput == "3") {
+            // Display the status of all appliances
+            manager.displayAppliancesStatus();
+        } else if (userInput == "4") {
+            // Exit the loop
+            break;
+        } else {
+            cout << "Invalid option! Please try again." << endl;
+        }
+    }
+
+    return 0;
+}
